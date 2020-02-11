@@ -5,8 +5,8 @@
       "componentType": 5126,
       "type": "VEC3",
       "count": 3672,
-      "min": [-3, -3, -3],
-      "max": [3, 3, 3]
+      "min": [-1.5, -1.5, -1.5],
+      "max": [1.5, 1.5, 1.5]
     },
     {
       "bufferView": 1,
@@ -16,6 +16,12 @@
     },
     {
       "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 3672
+    },
+    {
+      "bufferView": 3,
       "componentType": 5123,
       "type": "SCALAR",
       "count": 21996
@@ -37,14 +43,19 @@
     },
     {
       "buffer": 0,
-      "byteLength": 43992,
+      "byteLength": 29376,
       "byteOffset": 88128
+    },
+    {
+      "buffer": 0,
+      "byteLength": 43992,
+      "byteOffset": 117504
     }
   ],
   "buffers": [
     {
       "uri": "test_hi.bin",
-      "byteLength": 132120
+      "byteLength": 161496
     }
   ],
   "meshes": [
@@ -52,10 +63,11 @@
       "name": "octasphere",
       "primitives": [
         {
-          "indices": 2,
+          "indices": 3,
           "attributes": {
             "POSITION": 0,
-            "NORMAL": 1
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           }
         }
       ]
