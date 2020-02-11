@@ -1,0 +1,75 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 3672,
+      "min": [-3, -3, -3],
+      "max": [3, 3, 3]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 3672
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 21996
+    }
+  ],
+  "asset": {
+    "generator": "https://github.com/prideout/normal-map-test",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 44064
+    },
+    {
+      "buffer": 0,
+      "byteLength": 44064,
+      "byteOffset": 44064
+    },
+    {
+      "buffer": 0,
+      "byteLength": 43992,
+      "byteOffset": 88128
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "test_hi.bin",
+      "byteLength": 132120
+    }
+  ],
+  "meshes": [
+    {
+      "name": "octasphere",
+      "primitives": [
+        {
+          "indices": 2,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "root"
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [ 0 ]
+    }
+  ]
+}

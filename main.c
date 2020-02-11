@@ -1,5 +1,4 @@
 #define CGLTF_WRITE_IMPLEMENTATION
-//#define CGLTF_IMPLEMENTATION
 #define PAR_OCTASPHERE_IMPLEMENTATION
 
 #include "cgltf_write.h"
@@ -16,22 +15,68 @@ static par_octasphere_mesh generate_mesh(float corner_radius, int geometric_lod)
         .corner_radius = corner_radius,
         .width = 1.0f,
         .height = 1.0f,
-        .depth = 3.0f,
+        .depth = 1.0f,
         .num_subdivisions = geometric_lod,
     };
     par_octasphere_get_counts(&config, &num_indices, &num_vertices);
 
     const int vbufsize = sizeof(Vertex) * num_vertices;
     const int ibufsize = sizeof(uint16_t) * num_indices;
+    const int vbufsize3 = 3 * vbufsize;
+    const int ibufsize3 = 3 * ibufsize;
 
-    uint8_t* buffer = malloc(vbufsize + vbufsize + ibufsize);
+    uint8_t* buffer = malloc(vbufsize3 + vbufsize3 + ibufsize3);
+    uint8_t* posptr = buffer;
+    uint8_t* nrmptr = buffer + vbufsize3;
+    uint8_t* idxptr = buffer + vbufsize3 + vbufsize3;
 
-    par_octasphere_mesh mesh = {
-        .positions = (float*) (buffer + 0),
-        .normals = (float*) (buffer + vbufsize),
-        .indices = (uint16_t*) (buffer + vbufsize + vbufsize)
-    };
+    par_octasphere_mesh mesh = {};
+
+    mesh.positions = (float*) posptr;
+    mesh.normals = (float*) nrmptr;
+    mesh.indices = (uint16_t*) idxptr;
+    config.width = 3;
     par_octasphere_populate(&config, &mesh);
+    config.width = 1;
+
+    posptr += vbufsize;
+    nrmptr += vbufsize;
+    idxptr += ibufsize;
+
+    mesh.positions = (float*) posptr;
+    mesh.normals = (float*) nrmptr;
+    mesh.indices = (uint16_t*) idxptr;
+    config.height = 3;
+    par_octasphere_populate(&config, &mesh);
+    config.height = 1;
+
+    posptr += vbufsize;
+    nrmptr += vbufsize;
+    idxptr += ibufsize;
+
+    mesh.positions = (float*) posptr;
+    mesh.normals = (float*) nrmptr;
+    mesh.indices = (uint16_t*) idxptr;
+    config.depth = 3;
+    par_octasphere_populate(&config, &mesh);
+    config.depth = 1;
+
+
+    posptr = buffer;
+    nrmptr = buffer + vbufsize3;
+    idxptr = buffer + vbufsize3 + vbufsize3;
+    mesh.positions = (float*) posptr;
+    mesh.normals = (float*) nrmptr;
+    mesh.indices = (uint16_t*) idxptr;
+    mesh.num_indices *= 3;
+    mesh.num_vertices *= 3;
+
+    for (int i = num_indices * 1; i < num_indices * 2; i++) {
+        mesh.indices[i] += num_vertices * 1;
+    }
+    for (int i = num_indices * 2; i < num_indices * 3; i++) {
+        mesh.indices[i] += num_vertices * 2;
+    }
 
     return mesh;
 }
@@ -70,8 +115,8 @@ static void write_gltf(par_octasphere_mesh source, const char* gltf_path, const 
     accessors[0].type = cgltf_type_vec3;
     accessors[0].count = source.num_vertices;
     accessors[0].has_min = accessors[0].has_max = true;
-    accessors[0].min[0] = accessors[0].min[1] = accessors[0].min[2] = -1.0f;
-    accessors[0].max[0] = accessors[0].max[1] = accessors[0].max[2] = +1.0f;
+    accessors[0].min[0] = accessors[0].min[1] = accessors[0].min[2] = -3.0f;
+    accessors[0].max[0] = accessors[0].max[1] = accessors[0].max[2] = +3.0f;
 
     accessors[1].buffer_view = &buffer_views[1];
     accessors[1].component_type = cgltf_component_type_r_32f;
@@ -145,7 +190,11 @@ static void write_gltf(par_octasphere_mesh source, const char* gltf_path, const 
 }
 
 int main(int argc, char** argv) {
-    par_octasphere_mesh mesh = generate_mesh(0.1, 4);
-    write_gltf(mesh, "test.gltf", "test.bin");
-    return 0;
+    par_octasphere_mesh himesh = generate_mesh(0.1, 4);
+    write_gltf(himesh, "test_hi.gltf", "test_hi.bin");
+    printf("test_hi.gltf has %d verts\n", himesh.num_vertices);
+
+    par_octasphere_mesh lomesh = generate_mesh(0.1, 1);
+    write_gltf(lomesh, "test_lo.gltf", "test_lo.bin");
+    printf("test_lo.gltf has %d verts\n", lomesh.num_vertices);
 }
