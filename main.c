@@ -26,6 +26,8 @@ static par_octasphere_mesh generate_mesh(float corner_radius, int geometric_lod)
     const int tbufsize = sizeof(Vec2) * num_vertices;
     const int ibufsize = sizeof(uint16_t) * num_indices;
 
+    // We'll create 3 octaspheres and merge them into a single mesh:
+
     const int pbufsize3 = 3 * pbufsize;
     const int nbufsize3 = 3 * nbufsize;
     const int tbufsize3 = 3 * tbufsize;
@@ -38,6 +40,8 @@ static par_octasphere_mesh generate_mesh(float corner_radius, int geometric_lod)
     uint8_t* idxptr = buffer + pbufsize3 + nbufsize3 + tbufsize3;
 
     par_octasphere_mesh mesh = {};
+
+    // Tessellate part 1 of 3:
 
     mesh.positions = (float*) posptr;
     mesh.normals = (float*) nrmptr;
@@ -52,6 +56,8 @@ static par_octasphere_mesh generate_mesh(float corner_radius, int geometric_lod)
     texptr += tbufsize;
     idxptr += ibufsize;
 
+    // Tessellate part 2 of 3:
+
     mesh.positions = (float*) posptr;
     mesh.normals = (float*) nrmptr;
     mesh.texcoords = (float*) texptr;
@@ -65,6 +71,8 @@ static par_octasphere_mesh generate_mesh(float corner_radius, int geometric_lod)
     texptr += tbufsize;
     idxptr += ibufsize;
 
+    // Tessellate part 3 of 3:
+
     mesh.positions = (float*) posptr;
     mesh.normals = (float*) nrmptr;
     mesh.texcoords = (float*) texptr;
@@ -72,6 +80,8 @@ static par_octasphere_mesh generate_mesh(float corner_radius, int geometric_lod)
     config.depth = 3;
     par_octasphere_populate(&config, &mesh);
     config.depth = 1;
+
+    // Reset the buffer pointers and adjust the vertex count:
 
     posptr = buffer;
     nrmptr = buffer + pbufsize3;
@@ -86,11 +96,28 @@ static par_octasphere_mesh generate_mesh(float corner_radius, int geometric_lod)
     mesh.num_indices *= 3;
     mesh.num_vertices *= 3;
 
+    // Fix up indices in the 2nd and 3rd parts:
+
     for (int i = num_indices * 1; i < num_indices * 2; i++) {
         mesh.indices[i] += num_vertices * 1;
     }
     for (int i = num_indices * 2; i < num_indices * 3; i++) {
         mesh.indices[i] += num_vertices * 2;
+    }
+
+    // Fix up texture coordinates in the three parts:
+
+    for (int i = num_vertices * 0; i < num_vertices * 1; i++) {
+        mesh.texcoords[i * 2 + 1] *= 0.25f;
+        mesh.texcoords[i * 2 + 1] += 0.00f;
+    }
+    for (int i = num_vertices * 1; i < num_vertices * 2; i++) {
+        mesh.texcoords[i * 2 + 1] *= 0.25f;
+        mesh.texcoords[i * 2 + 1] += 0.25f;
+    }
+    for (int i = num_vertices * 2; i < num_vertices * 3; i++) {
+        mesh.texcoords[i * 2 + 1] *= 0.25f;
+        mesh.texcoords[i * 2 + 1] += 0.50f;
     }
 
     return mesh;
